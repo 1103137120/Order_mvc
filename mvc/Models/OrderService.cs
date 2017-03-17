@@ -44,7 +44,10 @@ namespace mvc.Models
         /// </summary>
         /// <returns></returns>
         public List<Models.Order> GetOrders() {
-            return new List<Order>();
+            List<Models.Order> result = new List<Order>();
+            result.Add(new Order() { CusId = "kuas", CusName = "高應大", OrderId = 001 });
+            result.Add(new Order() { CusId = "nkfust", CusName = "高第一", OrderId = 002 });
+            return result;
         }
     }
 }

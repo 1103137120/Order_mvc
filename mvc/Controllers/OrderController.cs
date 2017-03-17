@@ -15,9 +15,7 @@ namespace mvc.Controllers
         public ActionResult Index()
         {
             Models.OrderService orderService = new Models.OrderService();
-            var order = orderService.GetOrderById("11");
-            ViewBag.CusId = order.CusId;
-            ViewBag.CusName = order.CusName;
+            ViewBag.Data = orderService.GetOrders();
             return View();
         }
         /// <summary>
@@ -34,9 +32,18 @@ namespace mvc.Controllers
         /// <returns></returns>
         [HttpPost()]
         public ActionResult InsertOrder(Models.Order order) {
-            Models.OrderService orderService = new Models.OrderService();
-            orderService.InsertOrder(order);
-            return View("Index");
+            ViewBag.Desc1 = "我是 ViewBag";
+            ViewData["Desc2"] = "我是ViewData";
+            TempData["Desc3"] = "我是TempData";
+            return RedirectToAction("Index");
+        }
+        [HttpGet()]
+        public JsonResult TestJson() {
+            var result = new Models.Order() {
+                CusId = "ABC",
+                CusName="測試JSON"
+            };
+            return this.Json(result, JsonRequestBehavior.AllowGet);
         }
     }
 }

@@ -11,9 +11,22 @@
     <title>Index</title>
 </head>
 <body>
-    <div> 
-        @ViewBag.CusId
-        @ViewBag.CusName
+    <div>
+        <div>訂單編號</div>
+        <div>@Html.TextBox("txtOrderId")</div>
+<table>
+    <tr>
+        <td>客戶代號</td>
+        <td>客戶名稱</td>
+    </tr>
+    @foreach (var item in (List<mvc.Models.Order>)ViewBag.Data)
+    {
+        <tr>
+            <td>@item.CusId</td>
+            <td>@item.CusName</td>
+        </tr>
+    }
+</table>
     </div>
 </body>
 </html>
