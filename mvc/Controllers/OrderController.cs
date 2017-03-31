@@ -15,7 +15,9 @@ namespace mvc.Controllers
         public ActionResult Index()
         {
             Models.OrderService orderService = new Models.OrderService();
+            ViewBag.testgetorderbyid = orderService.GetOrderById("11070");
             ViewBag.Data = orderService.GetOrders();
+
             return View();
         }
         /// <summary>
@@ -40,8 +42,8 @@ namespace mvc.Controllers
         [HttpGet()]
         public JsonResult TestJson() {
             var result = new Models.Order() {
-                CusId = "ABC",
-                CusName="測試JSON"
+                CustId = "ABC",
+                CustName="測試JSON"
             };
             return this.Json(result, JsonRequestBehavior.AllowGet);
         }
