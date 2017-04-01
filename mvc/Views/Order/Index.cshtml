@@ -26,8 +26,21 @@
             <td>@item.CustName</td>            
         </tr>
     }
-    @ViewBag.testgetorderbyid.CustName
+    
+
 </table>
+        <table>
+            <tr>
+                <td>訂單編號</td><td>客戶名稱</td><td>訂購日期</td><td>發貨日期</td>
+            </tr>
+            <tr>
+                <td>@ViewBag.getOrderById.OrderId</td>
+                <td>@ViewBag.getOrderById.CompanyName</td>
+                <td>@ViewBag.getOrderById.OrderDate</td>
+                <td>@ViewBag.getOrderById.ShippedDate</td>
+            </tr>
+
+        </table>
     </div>
 </body>
 </html>

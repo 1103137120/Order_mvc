@@ -8,14 +8,14 @@ namespace mvc.Controllers
 {
     public class OrderController : Controller
     {
-       /// <summary>
-       /// 訂單管理首頁
-       /// </summary>
-       /// <returns></returns>
+        /// <summary>
+        /// 訂單管理首頁
+        /// </summary>
+        /// <returns></returns>       
         public ActionResult Index()
         {
             Models.OrderService orderService = new Models.OrderService();
-            ViewBag.testgetorderbyid = orderService.GetOrderById("11070");
+            ViewBag.getOrderById = orderService.GetOrderById("11069");
             ViewBag.Data = orderService.GetOrders();
 
             return View();

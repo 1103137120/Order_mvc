@@ -51,31 +51,33 @@ namespace mvc.Models
             //return result;
 
             DataTable dt = new DataTable();
-            String sql = @"SELECT o.[OrderID],o.[OrderDate],o.[RequiredDate],e.[FirstName],e.[LastName],p.[ProductName],p.[UnitPrice],od.[Qty],p.[UnitPrice]*od.[Qty] AS Subtotal
-                            FROM [Sales].[Orders] AS o 
-                            JOIN [Sales].[OrderDetails] AS od 
-	                            ON o.[OrderID]= od.[OrderID]
-                            JOIN [Production].[Products] AS p 
-	                            ON p.[ProductID] = od.[ProductID]
-                            JOIN [HR].[Employees] AS e 
-	                            ON e.[EmployeeID]=o.[EmployeeID]
-                            WHERE o.[OrderID]=@OrderId";
+            String sql = @"SELECT OrderID,CompanyName,convert(char(10),OrderDate,111) AS OrderDate,convert(char(10),ShippedDate,111) AS ShippedDate
+                           FROM [Sales].[Orders] AS o                           
+	                       JOIN [Sales].[Customers] AS c
+	                       ON o.CustomerID=c.CustomerID
+                           WHERE o.[OrderID]=@OrderId";
 
             using (SqlConnection conn = new SqlConnection(this.GetDBConnectionString()))
             {
-
                 conn.Open();
                 SqlCommand cmd = new SqlCommand(sql, conn);
                 cmd.Parameters.Add(new SqlParameter("@OrderId", orderId));
                 SqlDataAdapter sqlAdapter = new SqlDataAdapter(cmd);
                 sqlAdapter.Fill(dt);                
-                conn.Close();
-                
-                
+                conn.Close();                    
+            }
+            
+            foreach (DataRow dr in dt.Rows)
+            {
+                // Response.Write(string.Format("OrderId:{0}, OrderDate:{1}, RequiredDate:{2},FirstName:{3},LastName:{4},ProductName:{5},UnitPrice:{6},Qty:{7},Subtotal:{8}<br/>"
+                //     , dr["OrderId"], dr["OrderDate"], dr["RequiredDate"], dr["FirstName"], dr["LastName"], dr["ProductName"], dr["UnitPrice"], dr["Qty"], dr["Subtotal"]));
+                result.OrderId = Convert.ToInt32(dr["OrderId"]);
+                result.CompanyName = Convert.ToString(dr["CompanyName"]);
+                result.OrderDate = Convert.ToDateTime(dr["OrderDate"]);
+                result.ShippedDate = Convert.ToDateTime(dr["ShippedDate"]);              
             }
 
-            return null;
-
+            return result;           
 
         }
 

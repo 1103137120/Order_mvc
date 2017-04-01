@@ -24,6 +24,10 @@ namespace mvc.Models
         public string CustName { get; set; }
 
         /// <summary>
+        /// 客戶公司名稱
+        /// </summary>
+        public string CompanyName { get; set; }
+        /// <summary>
         /// 業務(員工)代號
         /// </summary>
         public int EmpId { get; set; }
@@ -36,12 +40,12 @@ namespace mvc.Models
         /// <summary>
         /// 訂單日期
         /// </summary>
-        public DateTime? Orderdate { get; set; }
+        public DateTime? OrderDate { get; set; }
 
         /// <summary>
         /// 需要日期
         /// </summary>
-        public DateTime? RequireDdate { get; set; }
+        public DateTime? RequireDate { get; set; }
 
         /// <summary>
         /// 出貨日期
