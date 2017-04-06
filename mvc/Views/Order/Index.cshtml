@@ -1,46 +1,64 @@
-﻿
-@{
-    Layout = null;
+﻿@model IEnumerable<mvc.Models.Order>
+
+<p>
+    @Html.ActionLink("新增", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.OrderId)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.CompanyName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.EmpName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.OrderDate)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.RequireDate)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ShippedDate)
+        </th>        
+        <th>
+            @Html.DisplayNameFor(model => model.ShipperName)
+        </th>
+       
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.OrderId)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.CompanyName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.EmpName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.OrderDate)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.RequireDate)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ShippedDate)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ShipperName)
+        </td>
+        <td>
+            @Html.ActionLink("編輯", "Edit", new { OrderId= item.OrderId }) |
+            @Html.ActionLink("詳細", "Detail", new { OrderId = item.OrderId }) |
+            @Html.ActionLink("刪除", "Delete", new { OrderId = item.OrderId })
+        </td>
+    </tr>
 }
 
-<!DOCTYPE html>
-
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title>Index</title>
-</head>
-<body>
-    <div>
-        <div>訂單編號</div>
-        <div>@Html.TextBox("txtOrderId")</div>
-<table>
-    <tr>
-        <td>客戶代號</td>
-        <td>客戶名稱</td>
-    </tr>
-    @foreach (var item in (List<mvc.Models.Order>)ViewBag.Data)
-    {
-        <tr>            
-            <td>@item.CustId</td>
-            <td>@item.CustName</td>            
-        </tr>
-    }
-    
-
 </table>
-        <table>
-            <tr>
-                <td>訂單編號</td><td>客戶名稱</td><td>訂購日期</td><td>發貨日期</td>
-            </tr>
-            <tr>
-                <td>@ViewBag.getOrderById.OrderId</td>
-                <td>@ViewBag.getOrderById.CompanyName</td>
-                <td>@ViewBag.getOrderById.OrderDate</td>
-                <td>@ViewBag.getOrderById.ShippedDate</td>
-            </tr>
-
-        </table>
-    </div>
-</body>
-</html>
