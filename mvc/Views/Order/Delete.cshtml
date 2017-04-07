@@ -14,14 +14,6 @@
         </dd>
 
         <dt>
-            @Html.DisplayNameFor(model => model.CustName)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.CustName)
-        </dd>
-
-        <dt>
             @Html.DisplayNameFor(model => model.CompanyName)
         </dt>
 
@@ -147,7 +139,7 @@
         @Html.AntiForgeryToken()
 
         <div class="form-actions no-color">
-            <input type="submit" value="Delete" class="btn btn-default" /> |
+            <input type="submit" value="刪除" class="btn btn-default" /> |
             @Html.ActionLink("回到訂單列表", "Index")
         </div>
     }

@@ -24,12 +24,6 @@ namespace mvc.Models
         public string CustId { get; set; }
 
         /// <summary>
-        /// 客戶名稱
-        /// </summary>
-        [DisplayName("客戶名稱")]
-        public string CustName { get; set; }
-
-        /// <summary>
         /// 客戶公司名稱
         /// </summary>
         [DisplayName("客戶公司名稱")]
