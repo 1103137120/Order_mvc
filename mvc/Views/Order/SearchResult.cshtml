@@ -1,20 +1,13 @@
 ﻿@model IEnumerable<mvc.Models.Order>
 
-<p>
-    @Html.ActionLink("新增", "Create")
-    @Html.ActionLink("查詢", "Search")
-</p>
 <table class="table">
     <tr>
         <th>
             @Html.DisplayNameFor(model => model.OrderId)
-        </th>
+        </th>        
         <th>
             @Html.DisplayNameFor(model => model.CompanyName)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.EmpName)
-        </th>
+        </th>       
         <th>
             @Html.DisplayNameFor(model => model.OrderDate)
         </th>
@@ -23,9 +16,6 @@
         </th>
         <th>
             @Html.DisplayNameFor(model => model.ShippedDate)
-        </th>        
-        <th>
-            @Html.DisplayNameFor(model => model.ShipperName)
         </th>
        
         <th></th>
@@ -35,13 +25,10 @@
     <tr>
         <td>
             @Html.DisplayFor(modelItem => item.OrderId)
-        </td>
+        </td>       
         <td>
             @Html.DisplayFor(modelItem => item.CompanyName)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.EmpName)
-        </td>
+        </td>        
         <td>
             @Html.DisplayFor(modelItem => item.OrderDate)
         </td>
@@ -50,12 +37,9 @@
         </td>
         <td>
             @Html.DisplayFor(modelItem => item.ShippedDate)
-        </td>
+        </td>       
         <td>
-            @Html.DisplayFor(modelItem => item.ShipperName)
-        </td>
-        <td>
-            @Html.ActionLink("編輯", "Edit", new { OrderId= item.OrderId }) |
+            @Html.ActionLink("編輯", "Edit", new { OrderId = item.OrderId }) |
             @Html.ActionLink("詳細", "Detail", new { OrderId = item.OrderId }) |
             @Html.ActionLink("刪除", "Delete", new { OrderId = item.OrderId })
         </td>
@@ -63,3 +47,6 @@
 }
 
 </table>
+<div>
+    @Html.ActionLink("回到全部訂單列表", "Index")
+</div>

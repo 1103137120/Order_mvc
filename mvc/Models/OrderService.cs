@@ -33,8 +33,6 @@ namespace mvc.Models
             DataTable dt = new DataTable();
             String sql = @"INSERT INTO [Sales].[Orders]([CustomerID],[EmployeeID],[OrderDate],[RequiredDate],[ShippedDate],[Freight],[ShipperID],[ShipName],[ShipAddress],[ShipCity],[ShipRegion],[ShipPostalCode],[ShipCountry])
                            VALUES (@CustomerID,@EmployeeID,@OrderDate,@RequiredDate,@ShippedDate,@Freight,@ShipperID,@ShipName,@ShipAddress,@ShipCity,@ShipRegion,@ShipPostalCode,@ShipCountry)";
-            //String sql = @"INSERT INTO [Sales].[Orders]([CustomerID],[EmployeeID],[OrderDate],[RequiredDate],[ShippedDate],[Freight],[ShipperID],[ShipName],[ShipAddress],[ShipCity],[ShipRegion],[ShipPostalCode],[ShipCountry])
-            //                VALUES (1,5,2017-02-03,2017-02-03,2017-02-03,3,3,3,3,3,1,1,'TW')";
 
             using (SqlConnection conn = new SqlConnection(this.GetDBConnectionString()))
             {
@@ -58,8 +56,59 @@ namespace mvc.Models
                 conn.Close();
             }          
         }
-        public void InsertOrderDetail(Models.Order order)
-        {
+        /// <summary>
+        /// 新增訂單明細
+        /// </summary>
+        /// <param name="order"></param>
+        public void InsertOrderDetail(Models.Order order) { }
+
+        public List<Order> SearchOrder(Models.Order order) {
+            List<Order> result = new List<Order>();
+            DataTable dt = new DataTable();
+            String sql = @"SELECT OrderID,c.CompanyName,LastName+' '+FirstName AS EmpName,ship.CompanyName AS ShipperName,convert(char(10),OrderDate,111) AS OrderDate,convert(char(10),OrderDate,111) AS RequiredDate,convert(char(10),ShippedDate,111) AS ShippedDate
+                           FROM [Sales].[Orders] AS o                           
+	                       JOIN [Sales].[Customers] AS c
+	                       ON o.CustomerID=c.CustomerID
+						   JOIN [HR].[Employees] AS e
+						   ON o.EmployeeID=e.EmployeeID
+						   JOIN [Production].[Suppliers] AS ship
+						   ON o.[ShipperID]=ship.SupplierID
+                           WHERE ";
+            if (order.OrderId != 0) {
+                sql += " OrderID=@OrderID";
+            }
+
+                using (SqlConnection conn = new SqlConnection(this.GetDBConnectionString()))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                if (order.OrderId !=0) { cmd.Parameters.Add(new SqlParameter("@OrderID", order.OrderId));  }
+                if (order.CompanyName != null) { cmd.Parameters.Add(new SqlParameter("@CompanyName", order.CompanyName)); sql += @" AND CompanyName=@CompanyName"; }
+                if (order.EmpName != null) { cmd.Parameters.Add(new SqlParameter("@EmpName", order.EmpName)); sql += @" AND EmpName=@EmpName"; }
+                if (order.ShipperName != null) { cmd.Parameters.Add(new SqlParameter("@ShipperName", order.ShipperName)); sql += @" AND ShipperName=@ShipperName"; }
+                if (order.OrderDate != null) { cmd.Parameters.Add(new SqlParameter("@OrderDate", order.OrderDate)); sql += @" AND OrderDate=@OrderDate"; }
+                if (order.RequireDate != null) { cmd.Parameters.Add(new SqlParameter("@RequiredDate", order.RequireDate)); sql += @" AND RequiredDate=@RequiredDate"; }
+                if (order.ShippedDate != null) { cmd.Parameters.Add(new SqlParameter("@ShippedDate", order.ShippedDate)); sql += @" AND ShippedDate=@ShippedDate"; }
+                
+                SqlDataAdapter sqlAdapter = new SqlDataAdapter(cmd);
+                sqlAdapter.Fill(dt);
+                conn.Close();
+            }
+
+            result = (from i in dt.AsEnumerable()
+                      select new Order()
+                      {
+                          OrderId = i.Field<int>("OrderID"),
+                          CompanyName = i.Field<string>("CompanyName"),
+                          EmpName = i.Field<string>("EmpName"),
+                          ShipperName = i.Field<string>("ShipperName"),
+                          OrderDate = i.Field<string>("OrderDate"),
+                          RequireDate = i.Field<string>("RequiredDate"),
+                          ShippedDate = i.Field<string>("ShippedDate")
+
+                      }).ToList<Order>();
+
+            return result;
         }
 
         /// <summary>
@@ -83,20 +132,42 @@ namespace mvc.Models
         /// <summary>
         /// 修改訂單
         /// </summary>
-        public void UpdateOrder() {
+        /// <param name="order"></param>
+        public void UpdateOrder(Models.Order order) {
+            DataTable dt = new DataTable();
+            String sql = @"INSERT INTO [Sales].[Orders]([CustomerID],[EmployeeID],[OrderDate],[RequiredDate],[ShippedDate],[Freight],[ShipperID],[ShipName],[ShipAddress],[ShipCity],[ShipRegion],[ShipPostalCode],[ShipCountry])
+                           VALUES (@CustomerID,@EmployeeID,@OrderDate,@RequiredDate,@ShippedDate,@Freight,@ShipperID,@ShipName,@ShipAddress,@ShipCity,@ShipRegion,@ShipPostalCode,@ShipCountry)";
 
+            using (SqlConnection conn = new SqlConnection(this.GetDBConnectionString()))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.Parameters.Add(new SqlParameter("@CustomerID", order.CustId));
+                cmd.Parameters.Add(new SqlParameter("@EmployeeID", order.EmpId));
+                cmd.Parameters.Add(new SqlParameter("@OrderDate", order.OrderDate));
+                cmd.Parameters.Add(new SqlParameter("@RequiredDate", order.RequireDate));
+                cmd.Parameters.Add(new SqlParameter("@ShippedDate", order.ShippedDate));
+                cmd.Parameters.Add(new SqlParameter("@Freight", order.Freight));
+                cmd.Parameters.Add(new SqlParameter("@ShipperID", order.ShipperId));
+                cmd.Parameters.Add(new SqlParameter("@ShipName", order.ShipName));
+                cmd.Parameters.Add(new SqlParameter("@ShipAddress", order.ShipAddress));
+                cmd.Parameters.Add(new SqlParameter("@ShipCity", order.ShipCity));
+                cmd.Parameters.Add(new SqlParameter("@ShipRegion", order.ShipRegion));
+                cmd.Parameters.Add(new SqlParameter("@ShipPostalCode", order.ShipPostalCode));
+                cmd.Parameters.Add(new SqlParameter("@ShipCountry", order.ShipCountry));
+                SqlDataAdapter sqlAdapter = new SqlDataAdapter(cmd);
+                sqlAdapter.Fill(dt);
+                conn.Close();
+            }
         }
-    /// <summary>
-    /// 取得每一筆訂單明細
-    /// </summary>
-    /// <param name="orderId">訂單ID</param>
-    /// <returns></returns>
+
+        /// <summary>
+        /// 取得每一筆訂單明細
+        /// </summary>
+        /// <param name="orderId">訂單ID</param>
+        /// <returns></returns>
         public Models.Order GetOrderById(int? orderId) {
             Models.Order result = new Order();
-            //result.CustId = "kuas";
-            //result.CustName = "高應大";
-            //result.OrderId = 001;
-            //return result;
 
             DataTable dt = new DataTable();
             String sql = @"SELECT OrderID,o.CustomerID,o.EmployeeID,c.CompanyName,LastName+' '+FirstName AS EmpName,convert(char(10),OrderDate,111) AS OrderDate,convert(char(10),OrderDate,111) AS RequiredDate,convert(char(10),ShippedDate,111) AS ShippedDate,o.ShipperID,ship.CompanyName AS ShipperName,Freight,ShipName,ShipAddress,ShipCity,ShipCountry,ShipPostalCode,ShipRegion
@@ -137,11 +208,10 @@ namespace mvc.Models
                 result.ShipCity= Convert.ToString(dr["ShipCity"]);
                 result.ShipRegion= Convert.ToString(dr["ShipRegion"]);
                 result.ShipPostalCode= Convert.ToString(dr["ShipPostalCode"]);
-                result.ShipCountry= Convert.ToString(dr["ShipCountry"]);             
+                result.ShipCountry= Convert.ToString(dr["ShipCountry"]);           
                    
             }
             return result;          
-
         }
 
         /// <summary>
@@ -159,7 +229,7 @@ namespace mvc.Models
 						   JOIN [HR].[Employees] AS e
 						   ON o.EmployeeID=e.EmployeeID
 						   JOIN [Production].[Suppliers] AS ship
-						   ON o.[ShipperID]=ship.SupplierID";                           
+						   ON o.[ShipperID]=ship.SupplierID";                         
 
             using (SqlConnection conn = new SqlConnection(this.GetDBConnectionString()))
             {

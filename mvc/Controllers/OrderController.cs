@@ -11,73 +11,119 @@ namespace mvc.Controllers
     public class OrderController : Controller
     {
         private OrderService orderService = new OrderService();
+
+        /// <summary>
+        /// 首頁
+        /// </summary>
+        /// <returns></returns>
         public ActionResult Index()
         {
             return View(orderService.GetOrders());
         }
 
+        /// <summary>
+        /// 新增訂單頁面
+        /// </summary>
+        /// <returns></returns>
         [HttpGet] 
         public ActionResult Create()
         {
             return View();
         }
 
+        /// <summary>
+        /// 新增訂單Action
+        /// </summary>
+        /// <param name="o">整份表單</param>
+        /// <returns></returns>
         [HttpPost]
         public ActionResult Create(Order o){
-            //var order = new Order
-            //{
-            //    CompanyName = o.CompanyName,
-            //};
-
-            if (ModelState.IsValid) { orderService.InsertOrder(o); }          
+            if (ModelState.IsValid) {
+                orderService.InsertOrder(o);
+            }          
             return RedirectToAction("Index");
-
         }
+
+        /// <summary>
+        /// 搜尋訂單頁面
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public ActionResult Search()
+        {
+            return View();
+        }
+
+        /// <summary>
+        /// 搜尋訂單Action
+        /// </summary>
+        /// <param name="o"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ActionResult Search(Order o)
+        {           
+            return View("SearchResult", orderService.SearchOrder(o));            
+        }
+
+        /// <summary>
+        /// 顯示訂單詳情
+        /// </summary>
+        /// <param name="orderId">訂單編號</param>
+        /// <returns></returns>
         public ActionResult Detail(int? orderId)
         {
             return View(orderService.GetOrderById(orderId));
-
         }
 
+        /// <summary>
+        /// 編輯訂單頁面
+        /// </summary>
+        /// <param name="orderId">訂單編號</param>
+        /// <returns></returns>
         [HttpGet]
         public ActionResult Edit(int? orderId)
         {
             return View(orderService.GetOrderById(orderId));
         }
 
-        //[HttpPost] //httq://server/home/edit?name=xxx 送出表單時
-        //public ActionResult Edit(int? orderId, FormCollection form)
-        //{
-        //    //TODO: 實務上應加入更新權限檢核，在此省略
-        //    //先讀出資料
-        //    OrderService origPlayer = new OrderService();
-        //    origPlayer.GetOrderById(orderId);
+        /// <summary>
+        /// 編輯訂單Action
+        /// </summary>
+        /// <param name="orderId">訂單編號</param>
+        /// <param name="form">表單</param>
+        /// <returns></returns>
+        [HttpPost]
+        public ActionResult Edit(int? orderId, FormCollection form)
+        {
+            var oldData = orderService.GetOrderById(orderId);
+            if (TryUpdateModel(oldData, "", form.AllKeys, new string[] {  }))
+            {
+                orderService.UpdateOrder(oldData);
+            }
+            else {
+                ModelState.AddModelError("UpdateError", "更新失敗!");
+                return View(orderService);
+            }
+            return RedirectToAction("Index");            
+        }
 
-        //    //用前端傳回的資料更新Key以外的欄位
-        //    if (
-        //        origPlayer != null &&
-        //        TryUpdateModel<OrderService>(
-        //            origPlayer,
-        //            //列出要更新的屬性, Name不得更換，故只有Score
-        //            //【補充】demo有篇TryUpdateModel介紹: http://demo.tc/Post/655
-        //            new string[] { "Score" }, form)
-        //       )
-        //        //資料無誤的話才儲存
-        //       origPlayer.Save(); 
-        //    else //更新失敗時
-        //    {
-        //        ModelState.AddModelError("UpdateError", "更新失敗!");
-        //        return View(origPlayer);
-        //    }
-        //    return RedirectToAction("Index");
-        //}
-
+        /// <summary>
+        /// 刪除訂單頁面
+        /// </summary>
+        /// <param name="orderId">訂單編號</param>
+        /// <returns></returns>
         [HttpGet]
         public ActionResult Delete(int? orderId)
         {
             return View(orderService.GetOrderById(orderId));
         }
 
+        /// <summary>
+        /// 刪除訂單Action
+        /// </summary>
+        /// <param name="orderId">訂單編號</param>
+        /// <param name="col">表單</param>
+        /// <returns></returns>
         [HttpPost]
         public ActionResult Delete(int? orderId, FormCollection col)
         {
