@@ -65,6 +65,35 @@ namespace mvc.Models
         public List<Order> SearchOrder(Models.Order order) {
             List<Order> result = new List<Order>();
             DataTable dt = new DataTable();
+            String sqlwhere = "1=1";
+            if (order.OrderId != 0)
+            {
+                sqlwhere = sqlwhere+ "AND OrderID=@OrderID";
+            }
+            if (order.CompanyName != null)
+            {
+                sqlwhere = sqlwhere + " AND c.CompanyName=@CompanyName";                
+            }
+            if (order.EmpName != null)
+            {
+                sqlwhere = sqlwhere + " AND LastName+' '+FirstName=@EmpName";
+            }
+            if (order.ShipperName != null)
+            {
+                sqlwhere = sqlwhere + " AND ShipperName=@ShipperName";
+            }
+            if (order.OrderDate != null)
+            {
+                sqlwhere = sqlwhere + " AND OrderDate=@OrderDate";
+            }
+            if (order.RequireDate != null)
+            {
+                sqlwhere = sqlwhere + " AND RequiredDate=@RequiredDate"; ;
+            }
+            if (order.ShippedDate != null)
+            {
+                sqlwhere = sqlwhere + " AND ShippedDate=@ShippedDate"; ;
+            }
             String sql = @"SELECT OrderID,c.CompanyName,LastName+' '+FirstName AS EmpName,ship.CompanyName AS ShipperName,convert(char(10),OrderDate,111) AS OrderDate,convert(char(10),OrderDate,111) AS RequiredDate,convert(char(10),ShippedDate,111) AS ShippedDate
                            FROM [Sales].[Orders] AS o                           
 	                       JOIN [Sales].[Customers] AS c
@@ -73,22 +102,19 @@ namespace mvc.Models
 						   ON o.EmployeeID=e.EmployeeID
 						   JOIN [Production].[Suppliers] AS ship
 						   ON o.[ShipperID]=ship.SupplierID
-                           WHERE ";
-            if (order.OrderId != 0) {
-                sql += " OrderID=@OrderID";
-            }
+                           WHERE "+ sqlwhere;
 
                 using (SqlConnection conn = new SqlConnection(this.GetDBConnectionString()))
             {
                 conn.Open();
                 SqlCommand cmd = new SqlCommand(sql, conn);
                 if (order.OrderId !=0) { cmd.Parameters.Add(new SqlParameter("@OrderID", order.OrderId));  }
-                if (order.CompanyName != null) { cmd.Parameters.Add(new SqlParameter("@CompanyName", order.CompanyName)); sql += @" AND CompanyName=@CompanyName"; }
-                if (order.EmpName != null) { cmd.Parameters.Add(new SqlParameter("@EmpName", order.EmpName)); sql += @" AND EmpName=@EmpName"; }
-                if (order.ShipperName != null) { cmd.Parameters.Add(new SqlParameter("@ShipperName", order.ShipperName)); sql += @" AND ShipperName=@ShipperName"; }
-                if (order.OrderDate != null) { cmd.Parameters.Add(new SqlParameter("@OrderDate", order.OrderDate)); sql += @" AND OrderDate=@OrderDate"; }
-                if (order.RequireDate != null) { cmd.Parameters.Add(new SqlParameter("@RequiredDate", order.RequireDate)); sql += @" AND RequiredDate=@RequiredDate"; }
-                if (order.ShippedDate != null) { cmd.Parameters.Add(new SqlParameter("@ShippedDate", order.ShippedDate)); sql += @" AND ShippedDate=@ShippedDate"; }
+                if (order.CompanyName != null) { cmd.Parameters.Add(new SqlParameter("@CompanyName", order.CompanyName)); }
+                if (order.EmpName!= null) { cmd.Parameters.Add(new SqlParameter("@EmpName", order.EmpName));}
+                if (order.ShipperName != null) { cmd.Parameters.Add(new SqlParameter("@ShipperName", order.ShipperName)); }
+                if (order.OrderDate != null) { cmd.Parameters.Add(new SqlParameter("@OrderDate", order.OrderDate)); }
+                if (order.RequireDate != null) { cmd.Parameters.Add(new SqlParameter("@RequiredDate", order.RequireDate));}
+                if (order.ShippedDate != null) { cmd.Parameters.Add(new SqlParameter("@ShippedDate", order.ShippedDate)); }
                 
                 SqlDataAdapter sqlAdapter = new SqlDataAdapter(cmd);
                 sqlAdapter.Fill(dt);
@@ -110,6 +136,8 @@ namespace mvc.Models
 
             return result;
         }
+
+
 
         /// <summary>
         /// 刪除訂單
@@ -135,13 +163,15 @@ namespace mvc.Models
         /// <param name="order"></param>
         public void UpdateOrder(Models.Order order) {
             DataTable dt = new DataTable();
-            String sql = @"INSERT INTO [Sales].[Orders]([CustomerID],[EmployeeID],[OrderDate],[RequiredDate],[ShippedDate],[Freight],[ShipperID],[ShipName],[ShipAddress],[ShipCity],[ShipRegion],[ShipPostalCode],[ShipCountry])
-                           VALUES (@CustomerID,@EmployeeID,@OrderDate,@RequiredDate,@ShippedDate,@Freight,@ShipperID,@ShipName,@ShipAddress,@ShipCity,@ShipRegion,@ShipPostalCode,@ShipCountry)";
+            String sql = @"UPDATE [Sales].[Orders]
+                           SET [CustomerID]=@CustomerID,[EmployeeID]=@EmployeeID,[OrderDate]=@OrderDate,[RequiredDate]=@RequiredDate,[ShippedDate]=@ShippedDate,[Freight]=@Freight,[ShipperID]=@ShipperID,[ShipName]=@ShipName,[ShipAddress]=@ShipAddress,[ShipCity]=@ShipCity,[ShipRegion]=@ShipRegion,[ShipPostalCode]=@ShipPostalCode,[ShipCountry]=@ShipCountry
+                           WHERE [OrderID]=@OrderID";
 
             using (SqlConnection conn = new SqlConnection(this.GetDBConnectionString()))
             {
                 conn.Open();
                 SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.Parameters.Add(new SqlParameter("@OrderID", order.OrderId));
                 cmd.Parameters.Add(new SqlParameter("@CustomerID", order.CustId));
                 cmd.Parameters.Add(new SqlParameter("@EmployeeID", order.EmpId));
                 cmd.Parameters.Add(new SqlParameter("@OrderDate", order.OrderDate));
