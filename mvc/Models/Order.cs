@@ -21,7 +21,7 @@ namespace mvc.Models
         /// 客戶代號
         /// </summary>
         [DisplayName("客戶代號")]
-        public string CustId { get; set; }
+        public int CustId { get; set; }
 
         /// <summary>
         /// 客戶公司名稱

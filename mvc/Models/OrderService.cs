@@ -70,13 +70,13 @@ namespace mvc.Models
             {
                 sqlwhere = sqlwhere+ "AND OrderID=@OrderID";
             }
-            if (order.CompanyName != null)
+            if (order.CustId != 0)
             {
-                sqlwhere = sqlwhere + " AND c.CompanyName=@CompanyName";                
+                sqlwhere = sqlwhere + " AND c.CustomerID=@CustomerID";                
             }
-            if (order.EmpName != null)
+            if (order.EmpId != 0)
             {
-                sqlwhere = sqlwhere + " AND LastName+' '+FirstName=@EmpName";
+                sqlwhere = sqlwhere + " AND e.EmployeeID=@EmployeeID";
             }
             if (order.ShipperName != null)
             {
@@ -109,8 +109,8 @@ namespace mvc.Models
                 conn.Open();
                 SqlCommand cmd = new SqlCommand(sql, conn);
                 if (order.OrderId !=0) { cmd.Parameters.Add(new SqlParameter("@OrderID", order.OrderId));  }
-                if (order.CompanyName != null) { cmd.Parameters.Add(new SqlParameter("@CompanyName", order.CompanyName)); }
-                if (order.EmpName!= null) { cmd.Parameters.Add(new SqlParameter("@EmpName", order.EmpName));}
+                if (order.CustId != 0) { cmd.Parameters.Add(new SqlParameter("@CustomerID", order.CustId)); }
+                if (order.EmpId!= 0) { cmd.Parameters.Add(new SqlParameter("@EmployeeID", order.EmpId));}
                 if (order.ShipperName != null) { cmd.Parameters.Add(new SqlParameter("@ShipperName", order.ShipperName)); }
                 if (order.OrderDate != null) { cmd.Parameters.Add(new SqlParameter("@OrderDate", order.OrderDate)); }
                 if (order.RequireDate != null) { cmd.Parameters.Add(new SqlParameter("@RequiredDate", order.RequireDate));}
@@ -223,7 +223,7 @@ namespace mvc.Models
             foreach (DataRow dr in dt.Rows)
             {
                 result.OrderId = Convert.ToInt32(dr["OrderID"]);
-                result.CustId = Convert.ToString(dr["CustomerID"]);
+                result.CustId = Convert.ToInt32(dr["CustomerID"]);
                 result.EmpId = Convert.ToInt32(dr["EmployeeID"]);
                 result.CompanyName = Convert.ToString(dr["CompanyName"]);
                 result.EmpName= Convert.ToString(dr["EmpName"]);
@@ -250,7 +250,6 @@ namespace mvc.Models
         /// <returns></returns>
         public List<Order> GetOrders() {
             List<Order> result = new List<Order>();
-            //result.Add(new Order() { OrderId = 123, CompanyName = "高應大", OrderDate = Convert.ToDateTime("2017/01/01"),ShippedDate= Convert.ToDateTime("2017/01/01") });
             DataTable dt = new DataTable();
             String sql = @"SELECT OrderID,c.CompanyName,LastName+' '+FirstName AS EmpName,ship.CompanyName AS ShipperName,convert(char(10),OrderDate,111) AS OrderDate,convert(char(10),OrderDate,111) AS RequiredDate,convert(char(10),ShippedDate,111) AS ShippedDate
                            FROM [Sales].[Orders] AS o                           
@@ -284,6 +283,145 @@ namespace mvc.Models
                       }).ToList<Order>();         
 
             return result;
+        }
+        /// <summary>
+        /// 取得客戶下拉式選單資料
+        /// </summary>
+        /// <returns></returns>
+        public List<Order> GetCusDropListItem()
+        {
+            List<Models.Order> MapResult = new List<Order>();
+            DataTable dt = new DataTable();
+            String sql = @"SELECT CustomerID,CompanyName
+                           FROM [Sales].[Customers]
+
+                           SELECT EmployeeID,LastName+' '+FirstName AS EmpName
+                           FROM [HR].[Employees]
+
+                           SELECT ShipperID,CompanyName AS ShipperName
+                           FROM [Sales].[Shippers]";
+
+            using (SqlConnection conn = new SqlConnection(this.GetDBConnectionString()))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                SqlDataAdapter sqlAdapter = new SqlDataAdapter(cmd);
+                sqlAdapter.Fill(dt);
+                conn.Close();
+            }
+
+            foreach (DataRow Row in dt.Rows)
+            {
+                MapResult.Add(new Order()
+                {
+                    CustId = (int)Row["CustomerID"],
+                    CompanyName = Row["CompanyName"].ToString()
+                }
+                );
+            }
+
+            return MapResult;
+        }
+        /// <summary>
+        /// 取得員工下拉式選單資料
+        /// </summary>
+        /// <returns></returns>
+        public List<Order> GetEmpDropListItem()
+        {
+            List<Models.Order> MapResult = new List<Order>();
+            DataTable dt = new DataTable();
+            String sql = @"SELECT EmployeeID,LastName+' '+FirstName AS EmpName
+                           FROM [HR].[Employees]
+
+                           SELECT ShipperID,CompanyName AS ShipperName
+                           FROM [Sales].[Shippers]";
+
+            using (SqlConnection conn = new SqlConnection(this.GetDBConnectionString()))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                SqlDataAdapter sqlAdapter = new SqlDataAdapter(cmd);
+                sqlAdapter.Fill(dt);
+                conn.Close();
+            }
+
+            foreach (DataRow Row in dt.Rows)
+            {
+                MapResult.Add(new Order()
+                {
+                    EmpId = (int)Row["EmployeeID"],
+                    EmpName = Row["EmpName"].ToString()
+                }
+                );
+            }
+            return MapResult;
+        }
+
+        /// <summary>
+        /// 取得出貨公司下拉式選單資料
+        /// </summary>
+        /// <returns></returns>
+        public List<Order> GetShipDropListItem()
+        {
+            List<Models.Order> MapResult = new List<Order>();
+            DataTable dt = new DataTable();
+            String sql = @"SELECT ShipperID,CompanyName AS ShipperName
+                           FROM [Sales].[Shippers]";
+
+            using (SqlConnection conn = new SqlConnection(this.GetDBConnectionString()))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                SqlDataAdapter sqlAdapter = new SqlDataAdapter(cmd);
+                sqlAdapter.Fill(dt);
+                conn.Close();
+            }
+
+            foreach (DataRow Row in dt.Rows)
+            {
+                MapResult.Add(new Order()
+                {
+                    ShipperId = (int)Row["ShipperID"],
+                    ShipperName = Row["ShipperName"].ToString()
+                }
+                );
+            }
+            return MapResult;
+        }
+
+        /// <summary>
+        /// 暫無用到的map
+        /// </summary>
+        /// <param name="OrderData"></param>
+        /// <returns></returns>
+        public List<Models.Order> MapOrderDropListData(DataTable OrderData)
+        {
+            List<Models.Order> MapResult = new List<Order>();
+            foreach (DataRow Row in OrderData.Rows)
+            {
+                MapResult.Add(new Order()
+                {
+                    CustId = (int)Row["CustomerID"],
+                    CompanyName = Row["CompanyName"].ToString(),
+                    EmpId = (int)Row["EmployeeID"],
+                    EmpName = Row["EmpName"].ToString(),
+                    Freight = (int)Row["Freight"],
+                    OrderDate = Row["OrderDate"].ToString(),
+                    OrderId = (int)Row["OrderID"],
+                    RequireDate = Row["RequireDate"].ToString(),
+                    ShipAddress = Row["ShipAddress"].ToString(),
+                    ShipCity = Row["ShipCity"].ToString(),
+                    ShipCountry = Row["ShipCountry"].ToString(),
+                    ShipName = Row["ShipName"].ToString(),
+                    ShippedDate = Row["ShippedDate"].ToString(),
+                    ShipperId = (int)Row["ShipperID"],
+                    ShipperName = Row["ShipperName"].ToString(),
+                    ShipPostalCode = Row["ShipPostalCode"].ToString(),
+                    ShipRegion = Row["ShipRegion"].ToString()
+                }
+                );
+            }
+            return MapResult;
         }
     }
 }

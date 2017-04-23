@@ -28,6 +28,27 @@ namespace mvc.Controllers
         [HttpGet] 
         public ActionResult Create()
         {
+            var CusDropListItem = orderService.GetCusDropListItem();
+            var EmpDropListItem = orderService.GetEmpDropListItem();
+            var ShipDropListItem = orderService.GetShipDropListItem();
+            List<SelectListItem > CustId = new List<SelectListItem>();
+            List<SelectListItem> EmpId = new List<SelectListItem>();
+            List<SelectListItem> ShipperId = new List<SelectListItem>();
+            foreach (var item in CusDropListItem)
+            {
+                CustId.Add(new SelectListItem() { Text=item.CompanyName,Value=item.CustId.ToString()});
+            }
+            foreach (var item in EmpDropListItem)
+            {                
+                EmpId.Add(new SelectListItem() { Text = item.EmpName, Value = item.EmpId.ToString()});
+            }
+            foreach (var item in ShipDropListItem)
+            {
+                ShipperId.Add(new SelectListItem() { Text = item.ShipperName, Value = item.ShipperId.ToString() });
+            }
+            ViewData["CustId"] = CustId;
+            ViewData["EmpId"] = EmpId;
+            ViewData["ShipperId"] = ShipperId;
             return View();
         }
 
@@ -51,6 +72,27 @@ namespace mvc.Controllers
         [HttpGet]
         public ActionResult Search()
         {
+            var CusDropListItem = orderService.GetCusDropListItem();
+            var EmpDropListItem = orderService.GetEmpDropListItem();
+            var ShipDropListItem = orderService.GetShipDropListItem();
+            List<SelectListItem> CustId = new List<SelectListItem>();
+            List<SelectListItem> EmpId = new List<SelectListItem>();
+            List<SelectListItem> ShipperId = new List<SelectListItem>();
+            foreach (var item in CusDropListItem)
+            {
+                CustId.Add(new SelectListItem() { Text = item.CompanyName, Value = item.CustId.ToString() });
+            }
+            foreach (var item in EmpDropListItem)
+            {
+                EmpId.Add(new SelectListItem() { Text = item.EmpName, Value = item.EmpId.ToString() });
+            }
+            foreach (var item in ShipDropListItem)
+            {
+                ShipperId.Add(new SelectListItem() { Text = item.ShipperName, Value = item.ShipperId.ToString() });
+            }
+            ViewData["CustId"] = CustId;
+            ViewData["EmpId"] = EmpId;
+            ViewData["ShipperId"] = ShipperId;
             return View();
         }
 
@@ -83,6 +125,27 @@ namespace mvc.Controllers
         [HttpGet]
         public ActionResult Edit(int? orderId)
         {
+            var CusDropListItem = orderService.GetCusDropListItem();
+            var EmpDropListItem = orderService.GetEmpDropListItem();
+            var ShipDropListItem = orderService.GetShipDropListItem();
+            List<SelectListItem> CustId = new List<SelectListItem>();
+            List<SelectListItem> EmpId = new List<SelectListItem>();
+            List<SelectListItem> ShipperId = new List<SelectListItem>();
+            foreach (var item in CusDropListItem)
+            {
+                CustId.Add(new SelectListItem() { Text = item.CompanyName, Value = item.CustId.ToString() });
+            }
+            foreach (var item in EmpDropListItem)
+            {
+                EmpId.Add(new SelectListItem() { Text = item.EmpName, Value = item.EmpId.ToString() });
+            }
+            foreach (var item in ShipDropListItem)
+            {
+                ShipperId.Add(new SelectListItem() { Text = item.ShipperName, Value = item.ShipperId.ToString() });
+            }
+            ViewData["CustIdItem"] = CustId;
+            ViewData["EmpIdItem"] = EmpId;
+            ViewData["ShipperIdItem"] = ShipperId;
             return View(orderService.GetOrderById(orderId));
         }
 
@@ -95,10 +158,10 @@ namespace mvc.Controllers
         [HttpPost]
         public ActionResult Edit(int? orderId, FormCollection form)
         {
-            var oldData = orderService.GetOrderById(orderId);
-            if (TryUpdateModel(oldData, "", form.AllKeys, new string[] {  }))
+            var data = orderService.GetOrderById(orderId);
+            if (TryUpdateModel(data, "", form.AllKeys, new string[] {  }))
             {
-                orderService.UpdateOrder(oldData);
+                orderService.UpdateOrder(data);
             }
             else {
                 ModelState.AddModelError("UpdateError", "更新失敗!");
