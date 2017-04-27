@@ -27,7 +27,7 @@ namespace mvc.Models
         /// 新增訂單
         /// </summary>
         /// <param name="order"></param>
-        public void InsertOrder(Models.Order order)
+        public void InsertOrder(Models.OrderDetailViewModel order)
         {
             Models.Order result = new Order();
             DataTable dt = new DataTable();
@@ -38,29 +38,77 @@ namespace mvc.Models
             {
                 conn.Open();
                 SqlCommand cmd = new SqlCommand(sql, conn);
-                cmd.Parameters.Add(new SqlParameter("@CustomerID",order.CustId));
-                cmd.Parameters.Add(new SqlParameter("@EmployeeID", order.EmpId));
-                cmd.Parameters.Add(new SqlParameter("@OrderDate", order.OrderDate));
-                cmd.Parameters.Add(new SqlParameter("@RequiredDate", order.RequireDate));
-                cmd.Parameters.Add(new SqlParameter("@ShippedDate", order.ShippedDate));
-                cmd.Parameters.Add(new SqlParameter("@Freight", order.Freight));
-                cmd.Parameters.Add(new SqlParameter("@ShipperID", order.ShipperId));
-                cmd.Parameters.Add(new SqlParameter("@ShipName", order.ShipName));
-                cmd.Parameters.Add(new SqlParameter("@ShipAddress", order.ShipAddress));
-                cmd.Parameters.Add(new SqlParameter("@ShipCity", order.ShipCity));
-                cmd.Parameters.Add(new SqlParameter("@ShipRegion", order.ShipRegion));
-                cmd.Parameters.Add(new SqlParameter("@ShipPostalCode", order.ShipPostalCode));
-                cmd.Parameters.Add(new SqlParameter("@ShipCountry", order.ShipCountry));
+                cmd.Parameters.Add(new SqlParameter("@CustomerID",order.Order.CustId));
+                cmd.Parameters.Add(new SqlParameter("@EmployeeID", order.Order.EmpId));
+                cmd.Parameters.Add(new SqlParameter("@OrderDate", order.Order.OrderDate));
+                cmd.Parameters.Add(new SqlParameter("@RequiredDate", order.Order.RequireDate));
+                cmd.Parameters.Add(new SqlParameter("@ShippedDate", order.Order.ShippedDate));
+                cmd.Parameters.Add(new SqlParameter("@Freight", order.Order.Freight));
+                cmd.Parameters.Add(new SqlParameter("@ShipperID", order.Order.ShipperId));
+                cmd.Parameters.Add(new SqlParameter("@ShipName", order.Order.ShipName));
+                cmd.Parameters.Add(new SqlParameter("@ShipAddress", order.Order.ShipAddress));
+                cmd.Parameters.Add(new SqlParameter("@ShipCity", order.Order.ShipCity));
+                cmd.Parameters.Add(new SqlParameter("@ShipRegion", order.Order.ShipRegion));
+                cmd.Parameters.Add(new SqlParameter("@ShipPostalCode", order.Order.ShipPostalCode));
+                cmd.Parameters.Add(new SqlParameter("@ShipCountry", order.Order.ShipCountry));
                 SqlDataAdapter sqlAdapter = new SqlDataAdapter(cmd);
                 sqlAdapter.Fill(dt);
                 conn.Close();
             }          
         }
         /// <summary>
+        /// 取得最新一筆訂單的ID
+        /// </summary>
+        /// <returns></returns>
+        public int getInsertOrderId()
+        {
+            Models.Order result = new Order();
+            int orderId=0;
+            DataTable dt = new DataTable();
+            String sql = @"SELECT top 1 OrderID
+                           FROM [Sales].[Orders]
+                           ORDER BY OrderID DESC ";
+
+            using (SqlConnection conn = new SqlConnection(this.GetDBConnectionString()))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand(sql, conn);                
+                SqlDataAdapter sqlAdapter = new SqlDataAdapter(cmd);
+                sqlAdapter.Fill(dt);
+                conn.Close();
+            }
+
+            foreach (DataRow dr in dt.Rows)
+            {
+                orderId = Convert.ToInt32(dr["OrderID"]);
+            }
+            return orderId;
+        }
+
+        /// <summary>
         /// 新增訂單明細
         /// </summary>
         /// <param name="order"></param>
-        public void InsertOrderDetail(Models.Order order) { }
+        public void InsertOrderDetail(Models.OrderDetailViewModel order, int orderId) {
+            Models.OrderDetail result = new OrderDetail();
+            DataTable dt = new DataTable();
+            String sql = @"INSERT INTO [Sales].[OrderDetails]([OrderID],[ProductID],[UnitPrice],[Qty])
+                           VALUES (@OrderID,@ProductID,@UnitPrice,@Qty)";
+            
+            using (SqlConnection conn = new SqlConnection(this.GetDBConnectionString()))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand(sql, conn);                
+                cmd.Parameters.Add(new SqlParameter("@OrderID", orderId));
+                cmd.Parameters.Add(new SqlParameter("@ProductID", order.OrderDetail[0].ProductId));
+                cmd.Parameters.Add(new SqlParameter("@UnitPrice", order.OrderDetail[0].UnitPrice));
+                cmd.Parameters.Add(new SqlParameter("@Qty", order.OrderDetail[0].Qty));                
+
+                SqlDataAdapter sqlAdapter = new SqlDataAdapter(cmd);
+                sqlAdapter.Fill(dt);
+                conn.Close();
+            }
+        }
 
         public List<Order> SearchOrder(Models.Order order) {
             List<Order> result = new List<Order>();

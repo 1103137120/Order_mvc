@@ -28,6 +28,12 @@ namespace mvc.Controllers
         [HttpGet] 
         public ActionResult Create()
         {
+            
+            OrderDetailViewModel viewModel= new OrderDetailViewModel();
+            var od = new List<OrderDetail>();
+            od.Add(new OrderDetail() { });
+            viewModel.OrderDetail = od;
+
             var CusDropListItem = orderService.GetCusDropListItem();
             var EmpDropListItem = orderService.GetEmpDropListItem();
             var ShipDropListItem = orderService.GetShipDropListItem();
@@ -49,7 +55,7 @@ namespace mvc.Controllers
             ViewData["CustId"] = CustId;
             ViewData["EmpId"] = EmpId;
             ViewData["ShipperId"] = ShipperId;
-            return View();
+            return View(viewModel);
         }
 
         /// <summary>
@@ -58,9 +64,16 @@ namespace mvc.Controllers
         /// <param name="o">整份表單</param>
         /// <returns></returns>
         [HttpPost]
-        public ActionResult Create(Order o){
+        public ActionResult Create(OrderDetailViewModel o){
             if (ModelState.IsValid) {
+
                 orderService.InsertOrder(o);
+                int orderId=orderService.getInsertOrderId();
+  //              var orderDetail = new List<OrderDetail>();
+   //            orderDetail = o.OrderDetail.ToList();
+            
+                    orderService.InsertOrderDetail(o,orderId);
+                
             }          
             return RedirectToAction("Index");
         }

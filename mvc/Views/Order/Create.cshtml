@@ -1,4 +1,4 @@
-﻿@model mvc.Models.Order
+﻿@model mvc.Models.OrderDetailViewModel
 
 
 @using (Html.BeginForm())
@@ -11,97 +11,97 @@
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         <table class="table table-bordered ">
             <tr>
-                <td>@Html.LabelFor(model => model.CompanyName, htmlAttributes: new { @class = "control-label " })</td>
+                <td>@Html.LabelFor(model => model.Order.CompanyName, htmlAttributes: new { @class = "control-label " })</td>
                 <td>
                     @{
                         List<SelectListItem> items = (List<SelectListItem>)ViewData["CustId"];
                     }
-                    @Html.DropDownListFor(model => model.CustId, items, "請選擇", null)
-                    @Html.ValidationMessageFor(model => model.CustId, "", new { @class = "text-danger" })
+                    @Html.DropDownListFor(model => model.Order.CustId, items, "請選擇", null)
+                    @Html.ValidationMessageFor(model => model.Order.CustId, "", new { @class = "text-danger" })
                 </td>
             </tr>
             <tr>
-                <td>@Html.LabelFor(model => model.EmpName, htmlAttributes: new { @class = "control-label " })</td>
+                <td>@Html.LabelFor(model => model.Order.EmpName, htmlAttributes: new { @class = "control-label " })</td>
                 <td>
                     @{
                         List<SelectListItem> EmpId = (List<SelectListItem>)ViewData["EmpId"];
                     }
-                    @Html.DropDownListFor(model => model.EmpId, EmpId, "請選擇", null)
-                    @Html.ValidationMessageFor(model => model.EmpId, "", new { @class = "text-danger" })
+                    @Html.DropDownListFor(model => model.Order.EmpId, EmpId, "請選擇", null)
+                    @Html.ValidationMessageFor(model => model.Order.EmpId, "", new { @class = "text-danger" })
                 </td>
             </tr>
             <tr>
-                <td>@Html.LabelFor(model => model.OrderDate, htmlAttributes: new { @class = "control-label " })</td>
+                <td>@Html.LabelFor(model => model.Order.OrderDate, htmlAttributes: new { @class = "control-label " })</td>
                 <td>
-                    @Html.EditorFor(model => model.OrderDate, new { htmlAttributes = new { @class = "form-control" } })
-                    @Html.ValidationMessageFor(model => model.OrderDate, "", new { @class = "text-danger" })
+                    @Html.EditorFor(model => model.Order.OrderDate, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Order.OrderDate, "", new { @class = "text-danger" })
                 </td>
             </tr>
             <tr>
-                <td>@Html.LabelFor(model => model.RequireDate, htmlAttributes: new { @class = "control-label " })</td>
+                <td>@Html.LabelFor(model => model.Order.RequireDate, htmlAttributes: new { @class = "control-label " })</td>
                 <td>
-                    @Html.EditorFor(model => model.RequireDate, new { htmlAttributes = new { @class = "form-control" } })
-                    @Html.ValidationMessageFor(model => model.RequireDate, "", new { @class = "text-danger" })
+                    @Html.EditorFor(model => model.Order.RequireDate, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Order.RequireDate, "", new { @class = "text-danger" })
                 </td>
             </tr>
             <tr>
-                <td>@Html.LabelFor(model => model.ShippedDate, htmlAttributes: new { @class = "control-label " })</td>
+                <td>@Html.LabelFor(model => model.Order.ShippedDate, htmlAttributes: new { @class = "control-label " })</td>
                 <td>
-                    @Html.EditorFor(model => model.ShippedDate, new { htmlAttributes = new { @class = "form-control" } })
-                    @Html.ValidationMessageFor(model => model.ShippedDate, "", new { @class = "text-danger" })
+                    @Html.EditorFor(model => model.Order.ShippedDate, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Order.ShippedDate, "", new { @class = "text-danger" })
                 </td>
             </tr>
             <tr>
-                <td>@Html.LabelFor(model => model.ShipperName, htmlAttributes: new { @class = "control-label " })</td>
+                <td>@Html.LabelFor(model => model.Order.ShipperName, htmlAttributes: new { @class = "control-label " })</td>
                 <td>
                     @{
                     List<SelectListItem> ShipperId = (List<SelectListItem>)ViewData["ShipperId"];
                 }
-                @Html.DropDownListFor(model => model.ShipperId, ShipperId, "請選擇", null)
-                @Html.ValidationMessageFor(model => model.ShipperId, "", new { @class = "text-danger" })
+                @Html.DropDownListFor(model => model.Order.ShipperId, ShipperId, "請選擇", null)
+                @Html.ValidationMessageFor(model => model.Order.ShipperId, "", new { @class = "text-danger" })
             </td>
         </tr>
         <tr>
-            <td>@Html.LabelFor(model => model.Freight, htmlAttributes: new { @class = "control-label " })</td>
+            <td>@Html.LabelFor(model => model.Order.Freight, htmlAttributes: new { @class = "control-label " })</td>
             <td>
-                @Html.EditorFor(model => model.Freight, new { htmlAttributes = new { @class = "form-control" } })
-            @Html.ValidationMessageFor(model => model.Freight, "", new { @class = "text-danger" })
+                @Html.EditorFor(model => model.Order.Freight, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.Order.Freight, "", new { @class = "text-danger" })
         </td>
     </tr>
     <tr>
-        <td>@Html.LabelFor(model => model.ShipCountry, htmlAttributes: new { @class = "control-label" })</td>
+        <td>@Html.LabelFor(model => model.Order.ShipCountry, htmlAttributes: new { @class = "control-label" })</td>
         <td>
-            @Html.EditorFor(model => model.ShipCountry, new { htmlAttributes = new { @class = "form-control" } })
-        @Html.ValidationMessageFor(model => model.ShipCountry, "", new { @class = "text-danger" })
+            @Html.EditorFor(model => model.Order.ShipCountry, new { htmlAttributes = new { @class = "form-control" } })
+        @Html.ValidationMessageFor(model => model.Order.ShipCountry, "", new { @class = "text-danger" })
     </td>
-    <td>@Html.LabelFor(model => model.ShipCity, htmlAttributes: new { @class = "control-label" })</td>
+    <td>@Html.LabelFor(model => model.Order.ShipCity, htmlAttributes: new { @class = "control-label" })</td>
     <td>
-        @Html.EditorFor(model => model.ShipCity, new { htmlAttributes = new { @class = "form-control" } })
-    @Html.ValidationMessageFor(model => model.ShipCity, "", new { @class = "text-danger" })
+        @Html.EditorFor(model => model.Order.ShipCity, new { htmlAttributes = new { @class = "form-control" } })
+    @Html.ValidationMessageFor(model => model.Order.ShipCity, "", new { @class = "text-danger" })
 </td>
 </tr>
 <tr>
-    <td>@Html.LabelFor(model => model.ShipRegion, htmlAttributes: new { @class = "control-label " })</td>
+    <td>@Html.LabelFor(model => model.Order.ShipRegion, htmlAttributes: new { @class = "control-label " })</td>
     <td>
-        @Html.EditorFor(model => model.ShipRegion, new { htmlAttributes = new { @class = "form-control" } })
-    @Html.ValidationMessageFor(model => model.ShipRegion, "", new { @class = "text-danger" })
+        @Html.EditorFor(model => model.Order.ShipRegion, new { htmlAttributes = new { @class = "form-control" } })
+    @Html.ValidationMessageFor(model => model.Order.ShipRegion, "", new { @class = "text-danger" })
 </td>
-<td>@Html.LabelFor(model => model.ShipPostalCode, htmlAttributes: new { @class = "control-label" })</td>
+<td>@Html.LabelFor(model => model.Order.ShipPostalCode, htmlAttributes: new { @class = "control-label" })</td>
 <td>
-    @Html.EditorFor(model => model.ShipPostalCode, new { htmlAttributes = new { @class = "form-control" } })
-@Html.ValidationMessageFor(model => model.ShipPostalCode, "", new { @class = "text-danger" })
+    @Html.EditorFor(model => model.Order.ShipPostalCode, new { htmlAttributes = new { @class = "form-control" } })
+@Html.ValidationMessageFor(model => model.Order.ShipPostalCode, "", new { @class = "text-danger" })
 </td>
 </tr>
 <tr>
-    <td>@Html.LabelFor(model => model.ShipAddress, htmlAttributes: new { @class = "control-label " })</td>
+    <td>@Html.LabelFor(model => model.Order.ShipAddress, htmlAttributes: new { @class = "control-label " })</td>
     <td>
-        @Html.EditorFor(model => model.ShipAddress, new { htmlAttributes = new { @class = "form-control" } })
-    @Html.ValidationMessageFor(model => model.ShipAddress, "", new { @class = "text-danger" })
+        @Html.EditorFor(model => model.Order.ShipAddress, new { htmlAttributes = new { @class = "form-control" } })
+    @Html.ValidationMessageFor(model => model.Order.ShipAddress, "", new { @class = "text-danger" })
 </td>
-<td>@Html.LabelFor(model => model.ShipName, htmlAttributes: new { @class = "control-label " })</td>
+<td>@Html.LabelFor(model => model.Order.ShipName, htmlAttributes: new { @class = "control-label " })</td>
 <td>
-    @Html.EditorFor(model => model.ShipName, new { htmlAttributes = new { @class = "form-control" } })
-@Html.ValidationMessageFor(model => model.ShipName, "", new { @class = "text-danger" })
+    @Html.EditorFor(model => model.Order.ShipName, new { htmlAttributes = new { @class = "form-control" } })
+@Html.ValidationMessageFor(model => model.Order.ShipName, "", new { @class = "text-danger" })
 </td>
 </tr>
 <tr><td>訂單金額總計</td><td></td></tr>
@@ -114,6 +114,18 @@
     </td>
 </tr>
 </table>
-
+        <table class="table table-bordered ">
+            <tr><td>商品</td><td>單價</td><td>數量</td><td>小計</td><td></td></tr>
+            <tr></tr>
+            @{ int count=0;}
+            @foreach (var item in Model.OrderDetail)
+            {
+                <tr>                     
+                    <td>@Html.EditorFor(model => Model.OrderDetail[count].ProductId, new { htmlAttributes = new { @class = "form-control" } })</td>
+                    <td>@Html.EditorFor(model => Model.OrderDetail[count].UnitPrice, new { htmlAttributes = new { @class = "form-control" } })</td>
+                    <td>@Html.EditorFor(model => Model.OrderDetail[count].Qty, new { htmlAttributes = new { @class = "form-control" } })</td>
+                </tr>
+            }
+        </table>
 </div>
                     }
