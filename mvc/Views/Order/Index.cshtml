@@ -1,65 +1,419 @@
-﻿@model IEnumerable<mvc.Models.Order>
+﻿@model mvc.Models.Order
 
-<p>
-    @Html.ActionLink("新增", "Create")
-    @Html.ActionLink("查詢", "Search")
-</p>
-<table class="table">
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.OrderId)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.CompanyName)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.EmpName)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.OrderDate)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.RequireDate)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.ShippedDate)
-        </th>        
-        <th>
-            @Html.DisplayNameFor(model => model.ShipperName)
-        </th>
-       
-        <th></th>
-    </tr>
+@{
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.OrderId)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.CompanyName)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.EmpName)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.OrderDate)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.RequireDate)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.ShippedDate)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.ShipperName)
-        </td>
-        <td>
-            @Html.ActionLink("編輯", "Edit", new { OrderId= item.OrderId }) |
-            @Html.ActionLink("詳細", "Detail", new { OrderId = item.OrderId }) |
-            @Html.ActionLink("刪除", "Delete", new { OrderId = item.OrderId })
-        </td>
-    </tr>
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-</table>
+
+
+   <script type="text/javascript">
+        $(function () {
+            var dataSrc = new kendo.data.DataSource({
+                transport: {
+                    read: {
+                        type: "POST",
+                        url: "/Order/GetOrders",
+                        dataType: "json"
+                    },
+                    create: {                        
+                        url: "/Order/Create",
+                        dataType: "json",
+                        contentType: "application/json",
+                        accepts: "application/json",
+                        type: "POST",
+                        complete: function (data) {                            
+                            //Grid重新顯示資料
+                            dataSrc.read({ page: 1});
+                            $("#gridData").data("kendoGrid").refresh();
+                        },
+                        error: function (xhr, error) {
+                            // 呼叫服務失敗後，要做什麼事
+                            dataSrc.read({ page: 1 });
+                            $("#gridData").data("kendoGrid").refresh();
+                        },
+                    },
+                    update:{
+                        type:"POST",
+                        url: "/Order/Edit",
+                        dataType: "json",
+                        complete: function (data) {
+                            //Grid重新顯示資料
+                            dataSrc.read({ page: 1 });
+                            $("#gridData").data("kendoGrid").refresh();
+
+                        },
+                        error: function (xhr, error) {
+                            // 呼叫服務失敗後，要做什麼事
+                        },
+                    },
+                    destroy:{
+                        type:"POST",
+                        url:"/Order/GetOrders",
+                        dataType: "json",
+                        complete: function (data) {
+                            //Grid重新顯示資料
+                            dataSrc.read({ page: 1 });
+                            $("#gridData").data("kendoGrid").refresh();
+                        },
+                        error: function (xhr, error) {
+                            // 呼叫服務失敗後，要做什麼事
+                        },
+                    },
+                    parameterMap: function (data, operation) {
+                        if (operation != "read") {
+                            return kendo.stringify({ model: data.models[0] });
+                        }
+                        return data;
+                    }
+                },
+                batch: true,
+                schema: {
+                    model:{
+                        id: "OrderId",
+                        fields: {
+                            OrderId: { editable: false,nullable:true},
+                            CustId: { validation: { required: true } },
+                            CompanyName: { hidden: true, defaultValue: "default" },
+                            EmpId: { validation: { required: true } },
+                            EmpName: { hidden: true, defaultValue: "default" },
+                            OrderDate: { validation: { required: true } },
+                            RequireDate: { validation: { required: true } },
+                            ShippedDate: {},
+                            ShipperId: {},
+                            ShipperName: { hidden: true, defaultValue: "default" },
+                            //Freight: {},
+                            //ShipCountry: {},
+                            //ShipCity: {},
+                            //ShipRegion: {},
+                            //ShipPostalCode: {},
+                            //ShipAddress: {},
+                            //ShipName: {},
+                        }
+                    },
+                    data: function (d) {
+                        return d.data;
+                    },
+                    total: function (d) {
+                        return d.total;
+                    },
+                },
+                //autoSync: true,
+                pageSize: 20,
+                serverPaging: true,
+                serverSorting: true
+            });
+
+
+            $("#gridData").kendoGrid({
+                dataSource: dataSrc,
+                columns: [
+                    { field: "OrderId", title: "訂單編號" },
+                    { field: "CustId", title: "客戶名稱", width: "180px", editor: cusDropDownEditor, template: "#=CompanyName#" },
+                    { field: "EmpId", title: "員工名稱", width: "180px", editor: empDropDownEditor, template: "#=EmpName#" },
+                    { field: "OrderDate", title: "訂單日期", format: "{0:yyyy/MM/dd}", editor: dateEditor },
+                    { field: "RequireDate", title: "接收日期", format: "{0:yyyy/MM/dd}", editor: dateEditor },
+                    { field: "ShippedDate", title: "出貨日期", format: "{0:yyyy/MM/dd}", editor: dateEditor },
+                    { field: "ShipperId", title: "出貨公司名稱", width: "180px", editor: shipDropDownEditor, template: "#=ShipperName#" },
+                    //{ field: "Freight", title: "運費" },
+                    //{ field: "ShipCountry", title: "出貨國家" },
+                    //{ field: "ShipCity", title: "出貨城市" },
+                    //{ field: "ShipRegion", title: "出貨地區" },
+                    //{ field: "ShipPostalCode", title: "出貨郵遞區號" },
+                    //{ field: "ShipAddress", title: "出貨地址" },
+                    //{ field: "ShipName", title: "出貨說明" },
+                    { command: [{ name: "edit", text: "編輯" }, { name: "destroy", text: "刪除" }], title: " ", width: "200px" },
+
+                ],
+                sortable: true,
+                pageable: true,
+                filterable: true,
+                width: '800',
+                editable: {
+                    mode: "popup",
+                    //template: $("#popup_editor").html()
+                },
+                edit: function (e) {
+                    $(e.container)
+                       .find("input[name='OrderId']", "input[name='CustId']")
+                          .data("kendoAutoComplete", "kendoDropDownList")
+                               .bind("change", function (e) {
+                                   console.log("auto complete changed");
+                               });
+                },
+                
+                toolbar: [{ name: "create", text: "新增" }],
+                
+            });
+        });      
+        function dateEditor(container, options) {
+            $('<input data-text-field="' + options.field + '" data-value-field="' + options.field + '" data-bind="value:' + options.field + '" data-format="' + options.format + '"/>')
+                    .appendTo(container)
+                    .kendoDatePicker({});
+        }
+        function cusDropDownEditor(container, options) {
+            $('<input required data-text-field="CompanyName" data-value-field="CustId" data-bind="value:' + options.field + '"/>')
+                .appendTo(container)
+                .kendoComboBox({
+                    autoBind: false,
+                    dataTextField: "CompanyName",
+                    dataValueField: "CustId",
+                    dataSource: cusListData,
+
+                });
+        }
+        var cusListData = new kendo.data.DataSource({
+            transport: {
+                read: {
+                    type: "POST",
+                    url: "/Order/GetCusDropListItem",
+                    dataType: "json",
+                    contentType: "application/json"
+                }
+            }
+        });
+        
+        function empDropDownEditor(container, options) {
+            $('<input required name="' + options.field + '"/>')
+                .appendTo(container)
+                .kendoDropDownList({
+                    autoBind: true,
+                    optionLabel: "請選擇 ",
+                    dataTextField: "EmpName",
+                    dataValueField: "EmpId",                    
+                    dataSource: {
+                        transport: {
+                            read: {
+                                type: "POST",
+                                url: "/Order/GetEmpDropListItem",
+                                dataType: "json",
+                                contentType: "application/json"
+                            }
+                        }
+                    }
+                });
+        }
+        function shipDropDownEditor(container, options) {
+            $('<input required name="' + options.field + '"/>')
+                .appendTo(container)
+                .kendoDropDownList({
+                    autoBind: true,
+                    optionLabel: "請選擇 ",
+                    dataTextField: "ShipperName",
+                    dataValueField: "ShipperId",
+                    dataSource: {
+                        transport: {
+                            read: {
+                                type: "POST",
+                                url: "/Order/GetShipDropListItem",
+                                dataType: "json",
+                                contentType: "application/json"
+                            }
+                        }
+                    }
+                });
+        }
+
+        //var autoCompleteDS = new kendo.data.DataSource({
+        //    transport: {
+        //        read: {
+        //            type: "POST",
+        //            url: "/Order/GetCusDropListItem",
+        //            dataType: "json",
+        //            contentType: "application/json"
+        //        }
+        //    }
+        //});
+        </script>   
+
+        
+<div id="gridData"></div>
+
+
+    @*<script id="popup_editor" type="text/x-kendo-template">
+        <div class="k-edit-label">
+            <label for="OrderId">訂單編號</label>
+        </div>
+        <input type="text" class="k-input k-textbox" name="OrderId" data-bind="value:OrderId" >
+
+            <div class="k-edit-label">
+                <label for="CustId">客戶名稱</label>
+            </div>
+            <input name="CustId"
+                data-bind="value:CustId"
+                data-value-field="CustId"
+                data-text-field="CompanyName"
+                data-source="autoCompleteDS"
+                data-role="dropdownlist" />
+
+            <div class="k-edit-label">
+                <label for="OrderDate">訂單日期</label>
+            </div>
+            <input type="text"
+                   name="OrderDate"
+                   data-type="date"
+                   data-bind="value:OrderDate"
+                   data-role="datepicker" />
+
+        </script>*@
+
+
+    @*@section Scripts
+        {
+                <script>
+                $(function () {
+                    //建立資料來源物件
+                    var dataSrc = new kendo.data.DataSource({
+                        transport: {
+                            read: {
+                                //以下其實就是$.ajax的參數
+                                type: "POST",
+                                url: "/Order",
+                                dataType: "json",
+                                data: {
+                                    //額外傳至後方的參數
+                                    keywd: function () {
+                                        return $("#tKeyword").val();
+                                    }
+                                }
+                            }
+                        },
+                        schema: {
+                            //取出資料陣列
+                            data: function (d) { return d.data; },
+                            //取出資料總筆數(計算頁數用)
+                            total: function (d) { return d.total; }
+                        },
+                        pageSize: 10,
+                        serverPaging: true,
+                        serverSorting: true
+                    });
+
+                    //JSON日期轉換
+                    var dateRegExp = /^\/Date\((.*?)\)\/$/;
+                    window.toDate = function (value) {
+                        var date = dateRegExp.exec(value);
+                        return new Date(parseInt(date[1]));
+                    }
+                    $("#dvGrid").kendoGrid({
+                        dataSource: dataSrc,
+                        columns: [
+                            { field: "OrderId", title: "訂單編號" },
+                            {
+                                field: "CompanyName", title: "客戶名稱名稱",
+                                template: '#= "<span class=\\"u-name\\">" + CompanyName + "</span>" #'
+                            },
+                            //{
+                            //    field: "RegDate", title: "加入日期",
+                            //    template: '#= kendo.toString(toDate(RegDate), "yyyy/MM/dd")#'
+                            //},
+                            //{ field: "Points", title: "累積點數" },
+                        ],
+                        sortable: true,
+                        pageable: true,
+                        dataBound: function () {
+                            //AJAX資料Bind完成後觸發
+                            var kw = $("#tKeyword").val();
+                            //若有設關鍵字，做Highlight處理
+                            if (kw.length > 0) {
+                                var re = new RegExp(kw, "g");
+                                $(".u-name").each(function () {
+                                    var $td = $(this);
+                                    $td.html($td.text()
+                                   .replace(re, "<span class='hi-lite'>$&</span>"));
+                                });
+                            }
+                        }
+                    });
+                    //按下查詢鈕
+                    $("#bQuery").click(function () {
+                        //要求資料來源重新讀取(並指定切至第一頁)
+                        dataSrc.read({ page: 1, skip: 0 });
+                        //Grid重新顯示資料
+                        $("#dvGrid").data("kendoGrid").refresh();
+                    });
+                });
+            </script>
+
+        }
+
+        <div style="padding: 10px;">
+
+            關鍵字:
+
+            <input id="tKeyword" /><input type="button" value="查詢" id="bQuery" />
+
+        </div>
+
+        <div id="dvGrid">
+
+        </div>*@
+
+
+
+    @*@model IEnumerable<mvc.Models.Order>
+
+        <p>
+            @Html.ActionLink("新增", "Create")
+            @Html.ActionLink("查詢", "Search")
+        </p>
+        <table class="table">
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.OrderId)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.CompanyName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.EmpName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.OrderDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.RequireDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.ShippedDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.ShipperName)
+                </th>
+
+                <th></th>
+            </tr>
+
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.OrderId)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CompanyName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.EmpName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.OrderDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.RequireDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ShippedDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ShipperName)
+                    </td>
+                    <td>
+                        @Html.ActionLink("編輯", "Edit", new { OrderId = item.OrderId }) |
+                        @Html.ActionLink("詳細", "Detail", new { OrderId = item.OrderId }) |
+                        @Html.ActionLink("刪除", "Delete", new { OrderId = item.OrderId })
+                    </td>
+                </tr>
+            }
+
+        </table>*@

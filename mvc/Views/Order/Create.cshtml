@@ -125,6 +125,7 @@
                     <td>@Html.EditorFor(model => Model.OrderDetail[count].UnitPrice, new { htmlAttributes = new { @class = "form-control" } })</td>
                     <td>@Html.EditorFor(model => Model.OrderDetail[count].Qty, new { htmlAttributes = new { @class = "form-control" } })</td>
                 </tr>
+                count++;
             }
         </table>
 </div>
