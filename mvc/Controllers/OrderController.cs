@@ -21,6 +21,7 @@ namespace mvc.Controllers
             //return View(orderService.GetOrders());
             return View();
         }
+
         /// <summary>
         /// 取得訂單資料並以Json格式傳到首頁View
         /// </summary>
@@ -40,9 +41,8 @@ namespace mvc.Controllers
         public JsonResult Create(Order model)
         {                           
                orderService.InsertOrder2(model);
-               return Json("新增成功", JsonRequestBehavior.AllowGet);              
+               return Json("新增成功", JsonRequestBehavior.AllowGet);            
             
-
         }
         public JsonResult GetCusDropListItem(KendoGridRequest request)
         {
@@ -62,6 +62,36 @@ namespace mvc.Controllers
             return Json(ShipDropListItem, JsonRequestBehavior.AllowGet);
 
         }
+
+        public ActionResult Delete()
+        {
+            return View();
+        }
+
+        [AcceptVerbs(HttpVerbs.Post)]
+        public ActionResult Delete(int orderId)
+        {
+            orderService.DeleteOrder(orderId);
+            return Json("刪除成功", JsonRequestBehavior.AllowGet);
+
+        }
+
+        public ActionResult Edit()
+    {
+        return View();
+    }
+
+    [AcceptVerbs(HttpVerbs.Post)]
+    public JsonResult Edit(Order model)
+    {
+            if (TryUpdateModel(model)) {
+                orderService.UpdateOrder2(model);
+                return Json("修改成功", JsonRequestBehavior.AllowGet);
+            }
+        return Json("修改失敗", JsonRequestBehavior.AllowGet);
+     }
+
+
         ///// <summary>
         ///// 新增訂單頁面
         ///// </summary>
@@ -171,86 +201,86 @@ namespace mvc.Controllers
             return View(orderService.GetOrderById(orderId));
         }
 
-        /// <summary>
-        /// 編輯訂單頁面
-        /// </summary>
-        /// <param name="orderId">訂單編號</param>
-        /// <returns></returns>
-        [HttpGet]
-        public ActionResult Edit(int? orderId)
-        {
-            var CusDropListItem = orderService.GetCusDropListItem();
-            var EmpDropListItem = orderService.GetEmpDropListItem();
-            var ShipDropListItem = orderService.GetShipDropListItem();
-            List<SelectListItem> CustId = new List<SelectListItem>();
-            List<SelectListItem> EmpId = new List<SelectListItem>();
-            List<SelectListItem> ShipperId = new List<SelectListItem>();
-            foreach (var item in CusDropListItem)
-            {
-                CustId.Add(new SelectListItem() { Text = item.CompanyName, Value = item.CustId.ToString() });
-            }
-            foreach (var item in EmpDropListItem)
-            {
-                EmpId.Add(new SelectListItem() { Text = item.EmpName, Value = item.EmpId.ToString() });
-            }
-            foreach (var item in ShipDropListItem)
-            {
-                ShipperId.Add(new SelectListItem() { Text = item.ShipperName, Value = item.ShipperId.ToString() });
-            }
-            ViewData["CustIdItem"] = CustId;
-            ViewData["EmpIdItem"] = EmpId;
-            ViewData["ShipperIdItem"] = ShipperId;
-            //先依訂單ID取得過往訂單，並傳資料到View
-            return View(orderService.GetOrderById(orderId));
-        }
+        ///// <summary>
+        ///// 編輯訂單頁面
+        ///// </summary>
+        ///// <param name="orderId">訂單編號</param>
+        ///// <returns></returns>
+        //[HttpGet]
+        //public ActionResult Edit(int? orderId)
+        //{
+        //    var CusDropListItem = orderService.GetCusDropListItem();
+        //    var EmpDropListItem = orderService.GetEmpDropListItem();
+        //    var ShipDropListItem = orderService.GetShipDropListItem();
+        //    List<SelectListItem> CustId = new List<SelectListItem>();
+        //    List<SelectListItem> EmpId = new List<SelectListItem>();
+        //    List<SelectListItem> ShipperId = new List<SelectListItem>();
+        //    foreach (var item in CusDropListItem)
+        //    {
+        //        CustId.Add(new SelectListItem() { Text = item.CompanyName, Value = item.CustId.ToString() });
+        //    }
+        //    foreach (var item in EmpDropListItem)
+        //    {
+        //        EmpId.Add(new SelectListItem() { Text = item.EmpName, Value = item.EmpId.ToString() });
+        //    }
+        //    foreach (var item in ShipDropListItem)
+        //    {
+        //        ShipperId.Add(new SelectListItem() { Text = item.ShipperName, Value = item.ShipperId.ToString() });
+        //    }
+        //    ViewData["CustIdItem"] = CustId;
+        //    ViewData["EmpIdItem"] = EmpId;
+        //    ViewData["ShipperIdItem"] = ShipperId;
+        //    //先依訂單ID取得過往訂單，並傳資料到View
+        //    return View(orderService.GetOrderById(orderId));
+        //}
 
-        /// <summary>
-        /// 編輯訂單Action
-        /// </summary>
-        /// <param name="orderId">訂單編號</param>
-        /// <param name="form">表單</param>
-        /// <returns></returns>
-        [HttpPost]
-        public ActionResult Edit(int? orderId, FormCollection form)
-        {
-            //取得過往訂單
-            var data = orderService.GetOrderById(orderId);
-            //判斷前端修改的值並修改，之後傳入UpdateOrder
-            if (TryUpdateModel(data, "", form.AllKeys, new string[] {  }))
-            {
-                orderService.UpdateOrder(data);
-            }
-            else {
-                ModelState.AddModelError("UpdateError", "更新失敗!");
-                return View(orderService);
-            }
-            return RedirectToAction("Index");            
-        }
+        ///// <summary>
+        ///// 編輯訂單Action
+        ///// </summary>
+        ///// <param name="orderId">訂單編號</param>
+        ///// <param name="form">表單</param>
+        ///// <returns></returns>
+        //[HttpPost]
+        //public ActionResult Edit(int? orderId, FormCollection form)
+        //{
+        //    //取得過往訂單
+        //    var data = orderService.GetOrderById(orderId);
+        //    //判斷前端修改的值並修改，之後傳入UpdateOrder
+        //    if (TryUpdateModel(data, "", form.AllKeys, new string[] {  }))
+        //    {
+        //        orderService.UpdateOrder(data);
+        //    }
+        //    else {
+        //        ModelState.AddModelError("UpdateError", "更新失敗!");
+        //        return View(orderService);
+        //    }
+        //    return RedirectToAction("Index");            
+        //}
 
-        /// <summary>
-        /// 刪除訂單頁面
-        /// </summary>
-        /// <param name="orderId">訂單編號</param>
-        /// <returns></returns>
-        [HttpGet]
-        public ActionResult Delete(int? orderId)
-        {
-            return View(orderService.GetOrderById(orderId));
-        }
+        ///// <summary>
+        ///// 刪除訂單頁面
+        ///// </summary>
+        ///// <param name="orderId">訂單編號</param>
+        ///// <returns></returns>
+        //[HttpGet]
+        //public ActionResult Delete(int? orderId)
+        //{
+        //    return View(orderService.GetOrderById(orderId));
+        //}
 
-        /// <summary>
-        /// 刪除訂單Action
-        /// </summary>
-        /// <param name="orderId">訂單編號</param>
-        /// <param name="col">表單</param>
-        /// <returns></returns>
-        [HttpPost]
-        public ActionResult Delete(int? orderId, FormCollection col)
-        {
-            orderService.GetOrderById(orderId);
-            if (orderService != null)
-                orderService.DeleteOrder(orderId);
-            return RedirectToAction("Index");
-        }
+        ///// <summary>
+        ///// 刪除訂單Action
+        ///// </summary>
+        ///// <param name="orderId">訂單編號</param>
+        ///// <param name="col">表單</param>
+        ///// <returns></returns>
+        //[HttpPost]
+        //public ActionResult Delete(int? orderId, FormCollection col)
+        //{
+        //    orderService.GetOrderById(orderId);
+        //    if (orderService != null)
+        //        orderService.DeleteOrder(orderId);
+        //    return RedirectToAction("Index");
+        //}
     }
 }

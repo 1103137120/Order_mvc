@@ -280,6 +280,41 @@ namespace mvc.Models
         }
 
         /// <summary>
+        /// 修改訂單2
+        /// </summary>
+        /// <param name="order"></param>
+        public void UpdateOrder2(Models.Order order)
+        {
+            DataTable dt = new DataTable();
+            String sql = @"UPDATE [Sales].[Orders]
+                           SET [CustomerID]=@CustomerID,[EmployeeID]=@EmployeeID,[OrderDate]=@OrderDate,[RequiredDate]=@RequiredDate,[ShippedDate]=@ShippedDate,[Freight]=@Freight,[ShipperID]=@ShipperID,[ShipName]=@ShipName,[ShipAddress]=@ShipAddress,[ShipCity]=@ShipCity,[ShipRegion]=@ShipRegion,[ShipPostalCode]=@ShipPostalCode,[ShipCountry]=@ShipCountry
+                           WHERE [OrderID]=@OrderID";
+
+            using (SqlConnection conn = new SqlConnection(this.GetDBConnectionString()))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.Parameters.Add(new SqlParameter("@OrderID", order.OrderId));
+                cmd.Parameters.Add(new SqlParameter("@CustomerID", order.CustId));
+                cmd.Parameters.Add(new SqlParameter("@EmployeeID", order.EmpId));
+                cmd.Parameters.Add(new SqlParameter("@OrderDate", order.OrderDate));
+                cmd.Parameters.Add(new SqlParameter("@RequiredDate", order.RequireDate));
+                cmd.Parameters.Add(new SqlParameter("@ShippedDate", order.ShippedDate));
+                cmd.Parameters.Add(new SqlParameter("@Freight", 33));
+                cmd.Parameters.Add(new SqlParameter("@ShipperID", 3));
+                cmd.Parameters.Add(new SqlParameter("@ShipName", "33"));
+                cmd.Parameters.Add(new SqlParameter("@ShipAddress", "twtw"));
+                cmd.Parameters.Add(new SqlParameter("@ShipCity", "taipei"));
+                cmd.Parameters.Add(new SqlParameter("@ShipRegion", "tw"));
+                cmd.Parameters.Add(new SqlParameter("@ShipPostalCode", "321"));
+                cmd.Parameters.Add(new SqlParameter("@ShipCountry", "tw"));
+                SqlDataAdapter sqlAdapter = new SqlDataAdapter(cmd);
+                sqlAdapter.Fill(dt);
+                conn.Close();
+            }
+        }
+
+        /// <summary>
         /// 取得每一筆訂單明細
         /// </summary>
         /// <param name="orderId">訂單ID</param>

@@ -34,9 +34,11 @@
                         },
                     },
                     update:{
-                        type:"POST",
                         url: "/Order/Edit",
                         dataType: "json",
+                        contentType: "application/json",
+                        accepts: "application/json",
+                        type: "POST",
                         complete: function (data) {
                             //Grid重新顯示資料
                             dataSrc.read({ page: 1 });
@@ -47,23 +49,32 @@
                             // 呼叫服務失敗後，要做什麼事
                         },
                     },
-                    destroy:{
-                        type:"POST",
-                        url:"/Order/GetOrders",
+                    destroy: {
+                        url: "/Order/Delete",
                         dataType: "json",
+                        contentType: "application/json",
+                        accepts: "application/json",
+                        type: "POST",
                         complete: function (data) {
                             //Grid重新顯示資料
                             dataSrc.read({ page: 1 });
                             $("#gridData").data("kendoGrid").refresh();
+                            
                         },
                         error: function (xhr, error) {
                             // 呼叫服務失敗後，要做什麼事
                         },
                     },
                     parameterMap: function (data, operation) {
-                        if (operation != "read") {
-                            return kendo.stringify({ model: data.models[0] });
+                        if (operation != "read" && operation != "destroy") {
+                            
+                            return kendo.stringify({ model: data.models[0] });                            
                         }
+                        if (operation == "destroy") {
+                            console.log(operation);
+                            console.log(data.models[0].OrderId);
+                            return kendo.stringify({ orderId: data.models[0].OrderId });
+                        };
                         return data;
                     }
                 },
@@ -71,7 +82,7 @@
                 schema: {
                     model:{
                         id: "OrderId",
-                        fields: {
+                        fields: {                          
                             OrderId: { editable: false,nullable:true},
                             CustId: { validation: { required: true } },
                             CompanyName: { hidden: true, defaultValue: "default" },
@@ -107,7 +118,7 @@
 
             $("#gridData").kendoGrid({
                 dataSource: dataSrc,
-                columns: [
+                columns: [                                    
                     { field: "OrderId", title: "訂單編號" },
                     { field: "CustId", title: "客戶名稱", width: "180px", editor: cusDropDownEditor, template: "#=CompanyName#" },
                     { field: "EmpId", title: "員工名稱", width: "180px", editor: empDropDownEditor, template: "#=EmpName#" },
@@ -132,16 +143,7 @@
                 editable: {
                     mode: "popup",
                     //template: $("#popup_editor").html()
-                },
-                edit: function (e) {
-                    $(e.container)
-                       .find("input[name='OrderId']", "input[name='CustId']")
-                          .data("kendoAutoComplete", "kendoDropDownList")
-                               .bind("change", function (e) {
-                                   console.log("auto complete changed");
-                               });
-                },
-                
+                },                
                 toolbar: [{ name: "create", text: "新增" }],
                 
             });
@@ -152,16 +154,23 @@
                     .kendoDatePicker({});
         }
         function cusDropDownEditor(container, options) {
-            $('<input required data-text-field="CompanyName" data-value-field="CustId" data-bind="value:' + options.field + '"/>')
-                .appendTo(container)
-                .kendoComboBox({
-                    autoBind: false,
-                    dataTextField: "CompanyName",
-                    dataValueField: "CustId",
-                    dataSource: cusListData,
-
-                });
+            $('<input data-value-primitive="true"  data-text-field="CompanyName" data-value-field="CustId" data-value-field="CompanyName" data-bind="value:' + options.field + '"/>').appendTo(container).kendoComboBox({
+                autoBind: false,
+                dataSource: cusListData,
+            });
         }
+
+        //function cusDropDownEditor(container, options) {
+        //    $('<input required data-text-field="CompanyName" data-value-field="CustId" data-bind="value:' + options.field + '"/>')
+        //        .appendTo(container)
+        //        .kendoComboBox({
+        //            autoBind: false,
+        //            dataTextField: "CompanyName",
+        //            dataValueField: "CustId",
+        //            dataSource: cusListData,
+
+        //        });
+        //}
         var cusListData = new kendo.data.DataSource({
             transport: {
                 read: {
@@ -174,11 +183,11 @@
         });
         
         function empDropDownEditor(container, options) {
-            $('<input required name="' + options.field + '"/>')
+            $('<input required data-text-field="EmpName" data-value-field="EmpId" data-value-field="EmpName" data-bind="value:' + options.field + '"/>')
                 .appendTo(container)
-                .kendoDropDownList({
-                    autoBind: true,
-                    optionLabel: "請選擇 ",
+                .kendoComboBox({
+                    autoBind: false,
+                    //optionLabel: "請選擇 ",
                     dataTextField: "EmpName",
                     dataValueField: "EmpId",                    
                     dataSource: {
@@ -189,8 +198,9 @@
                                 dataType: "json",
                                 contentType: "application/json"
                             }
-                        }
+                        },                        
                     }
+                   
                 });
         }
         function shipDropDownEditor(container, options) {
@@ -223,12 +233,86 @@
         //            contentType: "application/json"
         //        }
         //    }
-        //});
+       //});
+
+        
+
+        var products = [
+ {
+     "CustId": 6,
+     "CompanyName": "Grandma's Boysenberry Spread",
+     "Cust": { CompanyName: "Condiments", CustId: 2 },
+     "UnitPrice": "25.00"
+ }];
+
+        $(document).ready(function () {
+            var dataSource = new kendo.data.DataSource({
+                pageSize: 30,
+                data: products,
+                schema: {
+                    model: {
+                        id: "CustId",
+                        fields: {
+                            CustId: {
+                                editable: false,
+                                nullable: true
+                            },
+                            CompanyName: {
+                                validation: {
+                                    required: true
+                                }
+                            },
+                            Cust: { defaultValue: { CompanyName: "請選擇", CustId: 3 } },
+                            UnitPrice: {
+                                type: "number",
+                                validation: {
+                                    required: true,
+                                    min: 1
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            $("#grid").kendoGrid({
+                dataSource: dataSource,
+                pageable: true,
+                height: 260,
+                toolbar: ["create"],
+                columns: [
+                    { field: "OrderId", title: "訂單編號" },
+                {
+                    field: "Cust",
+                    template: "#=Cust.CompanyName#",
+                    width: "150px",
+                    editor: categoryDropDownEditor
+                },
+                {
+                    field: "UnitPrice",
+                    format: "{0:c}",
+                    width: "150px"
+                },
+                {
+                    command: "edit",
+                    title: " ",
+                    width: "110px"
+                }],
+                editable: "popup"
+            });
+        });
+
+        function categoryDropDownEditor(container, options) {
+            $('<input data-text-field="CompanyName" data-value-field="CustId" data-value-field="CompanyName" data-bind="value:' + options.field + '"/>').appendTo(container).kendoComboBox({
+                autoBind: false,
+                dataSource: cusListData,
+            });
+        }
         </script>   
 
         
 <div id="gridData"></div>
-
+<div id="grid"></div>
 
     @*<script id="popup_editor" type="text/x-kendo-template">
         <div class="k-edit-label">
