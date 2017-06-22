@@ -376,14 +376,25 @@ namespace mvc.Models
         {
             List<Order> result = new List<Order>();
             DataTable dt = new DataTable();
-            String sql = @"SELECT OrderID,c.CompanyName,LastName+' '+FirstName AS EmpName,ship.CompanyName AS ShipperName,convert(char(10),OrderDate,111) AS OrderDate,convert(char(10),OrderDate,111) AS RequiredDate,convert(char(10),ShippedDate,111) AS ShippedDate
-                           FROM [Sales].[Orders] AS o                           
-	                       JOIN [Sales].[Customers] AS c
-	                       ON o.CustomerID=c.CustomerID
-						   JOIN [HR].[Employees] AS e
-						   ON o.EmployeeID=e.EmployeeID
-						   JOIN [Production].[Suppliers] AS ship
-						   ON o.[ShipperID]=ship.SupplierID";
+            String sql = @"
+                    SELECT  OrderID,
+                            c.CustomerID,
+                            c.CompanyName,
+                            e.EmployeeID,
+                            LastName + ' ' + FirstName AS EmpName,
+                            ship.ShipperID,
+                            ship.CompanyName AS ShipperName,
+                            convert(char(10),OrderDate,111) AS OrderDate,
+                            convert(char(10),OrderDate,111) AS RequiredDate,
+                            convert(char(10),ShippedDate,111) AS ShippedDate
+                    FROM    [Sales].[Orders] AS o                           
+	                JOIN    [Sales].[Customers] AS c
+	                            ON o.CustomerID=c.CustomerID
+					JOIN    [HR].[Employees] AS e
+					            ON o.EmployeeID=e.EmployeeID
+					JOIN    [Sales].[Shippers] AS ship
+					            ON o.ShipperID=ship.ShipperID
+            ";
 
             using (SqlConnection conn = new SqlConnection(this.GetDBConnectionString()))
             {
@@ -398,8 +409,11 @@ namespace mvc.Models
                       select new Order()
                       {
                           OrderId = i.Field<int>("OrderID"),
+                          CustId = i.Field<int>("CustomerID"),
                           CompanyName = i.Field<string>("CompanyName"),
+                          EmpId = i.Field<int>("EmployeeID"),
                           EmpName = i.Field<string>("EmpName"),
+                          ShipperId = i.Field<int>("ShipperID"),
                           ShipperName = i.Field<string>("ShipperName"),
                           OrderDate = i.Field<string>("OrderDate"),
                           RequireDate = i.Field<string>("RequiredDate"),
